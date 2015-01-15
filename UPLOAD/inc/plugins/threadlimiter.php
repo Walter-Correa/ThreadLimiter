@@ -133,13 +133,17 @@ function threadlimiter_activate()
 
 function threadlimiter_deactivate()
 {
-	global $db;	
-	$db->query("DELETE FROM ".TABLE_PREFIX."settinggroups WHERE name='threadlimiter_settings'");
-	$db->query("DELETE FROM ".TABLE_PREFIX."settings WHERE name='threadlimiter_enable'");
-    $db->query("DELETE FROM ".TABLE_PREFIX."settings WHERE name='threadlimiter_gid'");
-	$db->query("DELETE FROM ".TABLE_PREFIX."settings WHERE name='threadlimiter_limit'");
-    $db->query("DELETE FROM ".TABLE_PREFIX."settings WHERE name='threadlimiter_fid'");
-	rebuild_settings();
+	global $mybb, $db;	
+	
+	$result = $db->simple_select('settinggroups', 'gid', "name = 'threadlimiter_settings'", array('limit' => 1));
+	$group = $db->fetch_array($result);
+	
+	if(!empty($group['gid']))
+	{
+		$db->delete_query('settinggroups', "gid='{$group['gid']}'");
+		$db->delete_query('settings', "gid='{$group['gid']}'");
+		rebuild_settings();
+	}
 }
 
 function threadlimiter_addnewthread()
