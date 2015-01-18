@@ -37,7 +37,8 @@ function threadlimiter_info()
 		"website"		=>	"https://github.com/SvePu/ThreadLimiter",
 		"author"		=>	"SvePu",
 		"authorsite"	=> 	"https://github.com/SvePu",
-		"version"		=>	"1.0",
+		"codename"		=> "threadlimiter",
+		"version"		=>	"1.1",
 		"compatibility"	=>	"18*"
 	);
 	
