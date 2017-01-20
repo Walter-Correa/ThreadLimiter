@@ -24,7 +24,7 @@ if(!defined("IN_MYBB"))
 }
 
 $plugins->add_hook("newthread_start", "threadlimiter_addnewthread");
-$plugins->add_hook("forumdisplay_thread", "threadlimiter_newthreadbutton");
+$plugins->add_hook("forumdisplay_get_threads", "threadlimiter_newthreadbutton");
 
 function threadlimiter_info()
 {
@@ -38,7 +38,7 @@ function threadlimiter_info()
 		"author"		=>	"SvePu",
 		"authorsite"	=> 	"https://github.com/SvePu",
 		"codename"		=> "threadlimiter",
-		"version"		=>	"1.1",
+		"version"		=>	"1.2",
 		"compatibility"	=>	"18*"
 	);
 	
@@ -118,17 +118,28 @@ function threadlimiter_activate()
 	);
 	$db->insert_query("settings", $threadlimiter_3);
 	
+	$threadlimiter_4 = array(
+		"name"			=> "threadlimiter_reset_time",
+		"title"			=> $db->escape_string($lang->threadlimiter_reset_time_title),
+		"description" 	=> $db->escape_string($lang->threadlimiter_reset_time_title_desc),
+        'optionscode'  	=> 'numeric',
+        'value'        	=> '0',
+		"disporder"		=> "4",
+		"gid" 			=> (int)$gid
+	);
+	$db->insert_query("settings", $threadlimiter_4);
 	
-    $threadlimiter_4 = array(
+	
+    $threadlimiter_5 = array(
 		"name"			=> "threadlimiter_fid",
 		"title"			=> $db->escape_string($lang->threadlimiter_fid_title),
 		"description" 	=> $db->escape_string($lang->threadlimiter_fid_title_desc),
         'optionscode'  	=> 'forumselect',
         'value'        	=> '-1',
-		"disporder"		=> "4",
+		"disporder"		=> "5",
 		"gid" 			=> (int)$gid
 	);
-	$db->insert_query("settings", $threadlimiter_4);
+	$db->insert_query("settings", $threadlimiter_5);
 	rebuild_settings();
 }
 
@@ -157,12 +168,22 @@ function threadlimiter_addnewthread()
 	}
 	if(in_array($fid, explode(",", $settings['threadlimiter_fid'])) || $settings['threadlimiter_fid'] == "-1")
 	{
-		$threadcounter = $db->fetch_field($db->simple_select("threads", "COUNT(*) as threads", "uid='{$mybb->user['uid']}' AND fid='{$fid}'"), "threads");       
-		if($threadcounter >= $settings['threadlimiter_limit'])
+		$resettimer = '';
+		if($settings['threadlimiter_reset_time'] > 0)
 		{
-			if ($settings['threadlimiter_limit'] == "1"){
+			$timesearch = TIME_NOW - (60 * 60 * 24 * $settings['threadlimiter_reset_time']);
+			$resettimer = ' AND dateline>'.$timesearch.'';
+		}
+		$query = $db->simple_select("threads", "*", "uid='{$mybb->user['uid']}' AND fid='{$fid}'{$resettimer}");
+		$numthreads = $db->num_rows($query);    
+		if($numthreads >= $settings['threadlimiter_limit'])
+		{
+			if ($settings['threadlimiter_limit'] == "1")
+			{
 				error($lang->sprintf($db->escape_string($lang->threadlimiter_error_one), $settings['threadlimiter_limit']));
-			} else {
+			}
+			else
+			{
 				error($lang->sprintf($db->escape_string($lang->threadlimiter_error_more), $settings['threadlimiter_limit']));
 			}
 		} 
@@ -182,8 +203,15 @@ function threadlimiter_newthreadbutton()
 	{
 		if(in_array($fid, explode(",", $settings['threadlimiter_fid'])) || $settings['threadlimiter_fid'] == "-1")
 		{
-			$threadcounter = $db->fetch_field($db->simple_select("threads", "COUNT(*) as threads", "uid='{$mybb->user['uid']}' AND fid='{$fid}'"), "threads");       
-			if($threadcounter >= $settings['threadlimiter_limit'])
+			$resettimer = '';
+			if($settings['threadlimiter_reset_time'] > 0)
+			{
+				$timesearch = TIME_NOW - (60 * 60 * 24 * $settings['threadlimiter_reset_time']);
+				$resettimer = ' AND dateline>'.$timesearch.'';
+			}
+			$query = $db->simple_select("threads", "*", "uid='{$mybb->user['uid']}' AND fid='{$fid}'{$resettimer}");
+			$numthreads = $db->num_rows($query);    
+			if($numthreads >= $settings['threadlimiter_limit'])
 			{
 				$hide_button = true;
 				$newthread = "";
@@ -191,4 +219,3 @@ function threadlimiter_newthreadbutton()
 		}  
 	}   
 }
-?>

@@ -1,6 +1,6 @@
 <?php
 /*
-* ThreadLimiter - 1.0 Config Language File German (formal)
+* ThreadLimiter - 1.2 Config Language File German (formal)
 * Licensed under GNU/GPL v3
 */
 
@@ -14,6 +14,8 @@ $l['threadlimiter_gid_title'] = "User-Gruppen";
 $l['threadlimiter_gid_title_desc'] = "Bestimmen Sie die Nutzergruppen für die diese Regelung gelten soll. (Shift/Strg halten um mehrere auzuwählen)";
 $l['threadlimiter_limit_title'] = "Erstellbare Themen in definierten Foren";
 $l['threadlimiter_limit_title_desc'] = "Geben Sie die max. Anzahl der Themen an, die Nutzer der gewählten Gruppe(n) in den definierten Foren erstellen kann. (Standart: 2)";
+$l['threadlimiter_reset_time_title'] = "Thread Limit nach X Tagen zurücksetzen";
+$l['threadlimiter_reset_time_title_desc'] = "Geben Sie die Anzahl der Tage ein, bis das Limit zurückgesetzt wird. 0 deaktiviert diese Funktion.";
 $l['threadlimiter_fid_title'] = "Foren-Auswahl";
 $l['threadlimiter_fid_title_desc'] = "Wählen Sie die Foren in denen die Pluginfunktionen aktiv sind. (Shift/Strg halten um mehrere auzuwählen - nur Foren, keine Kategorien)";
 ?>
