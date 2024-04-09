@@ -41,7 +41,6 @@ function threadlimiter_info()
 		"version"		=>	"1.2",
 		"compatibility"	=>	"18*"
 	);
-	
 	$info_desc = '';
 	$gid_result = $db->simple_select('settinggroups', 'gid', "name = 'threadlimiter_settings'", array('limit' => 1));
 	$settings_group = $db->fetch_array($gid_result);
@@ -50,97 +49,100 @@ function threadlimiter_info()
 		$info_desc .= "<span style=\"font-size: 0.9em;\">(~<a href=\"index.php?module=config-settings&action=change&gid=".$settings_group['gid']."\"> ".$db->escape_string($lang->threadlimiter_settings_title)." </a>~)</span>";
 	}
     
-    if(is_array($plugins_cache) && is_array($plugins_cache['active']) && $plugins_cache['active']['threadlimiter'])
-    {
+    	if(is_array($plugins_cache) && is_array($plugins_cache['active']) && $plugins_cache['active']['threadlimiter'])
+    	{
 		$info_desc .= '<form action="https://www.paypal.com/cgi-bin/webscr" method="post" style="float: right;" target="_blank" />
-<input type="hidden" name="cmd" value="_s-xclick" />
-<input type="hidden" name="hosted_button_id" value="VGQ4ZDT8M7WS2" />
-<input type="image" src="https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_pp_142x27.png" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" />
-<img alt="" border="0" src="https://www.paypalobjects.com/de_DE/i/scr/pixel.gif" width="1" height="1" />
-</form>';
+		<input type="hidden" name="cmd" value="_s-xclick" />
+		<input type="hidden" name="hosted_button_id" value="VGQ4ZDT8M7WS2" />
+		<input type="image" src="https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_pp_142x27.png" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" />
+		<img alt="" border="0" src="https://www.paypalobjects.com/de_DE/i/scr/pixel.gif" width="1" height="1" />
+		</form>';
 	}
-	
 	if($info_desc != '')
 	{
 		$info['description'] = $info_desc.'<br />'.$info['description'];
 	}
-    
-    return $info;
+    	return $info;
 }
 
 function threadlimiter_activate()
 {
-    global $db, $lang;
-	$lang->load('config_threadlimiter');
-	$query_add = $db->simple_select("settinggroups", "COUNT(*) as rows");
-	$rows = $db->fetch_field($query_add, "rows");
-    $threadlimiter_group = array(
+    	global $db, $lang;	
+	$result = $db->simple_select('settinggroups', 'gid', "name = 'threadlimiter_settings'", array('limit' => 1));
+	$group = $db->fetch_array($result);
+
+	if(empty($group['gid']))
+	{
+		$lang->load('config_threadlimiter');
+		$query_add = $db->simple_select("settinggroups", "COUNT(*)");
+		$rows = $db->fetch_field($query_add, "rows");
+		$threadlimiter_group = array(
 		"name" 			=>	"threadlimiter_settings",
 		"title" 		=>	$db->escape_string($lang->threadlimiter_settings_title),
 		"description" 	=>	$db->escape_string($lang->threadlimiter_settings_title_desc),
 		"disporder"		=> 	$rows+1,
 		"isdefault" 	=>  0
-	);
-    $db->insert_query("settinggroups", $threadlimiter_group);
-	$gid = $db->insert_id();
+		);
+    		$db->insert_query("settinggroups", $threadlimiter_group);
+		$gid = $db->insert_id();
 	
-	$threadlimiter_1 = array(
-        'sid'           => 'NULL',
-        'name'			=> 'threadlimiter_enable',
-        'title'			=> $db->escape_string($lang->threadlimiter_enable_title),
-        'description'  	=> $db->escape_string($lang->threadlimiter_enable_title_desc),
-        'optionscode'  	=> 'yesno',
-        'value'        	=> '1',
-        'disporder'		=> 1,
-        "gid" 			=> (int)$gid
-    );
-	$db->insert_query('settings', $threadlimiter_1);
+		$threadlimiter_1 = array(
+        	'name'			=> 'threadlimiter_enable',
+        	'title'			=> $db->escape_string($lang->threadlimiter_enable_title),
+        	'description'  	=> $db->escape_string($lang->threadlimiter_enable_title_desc),
+        	'optionscode'  	=> 'yesno',
+        	'value'        	=> '1',
+        	'disporder'		=> 1,
+        	"gid" 			=> (int)$gid
+    		);
+		$db->insert_query('settings', $threadlimiter_1);
 	
-	$threadlimiter_2 = array(
+		$threadlimiter_2 = array(
 		"name"			=> "threadlimiter_gid",
 		"title"			=> $db->escape_string($lang->threadlimiter_gid_title),
 		"description" 	=> $db->escape_string($lang->threadlimiter_gid_title_desc),
-        'optionscode'  	=> 'groupselect',
-        'value'        	=> '2,5',
+        	'optionscode'  	=> 'groupselect',
+        	'value'        	=> '2,5',
 		"disporder"		=> "2",
 		"gid" 			=> (int)$gid
-	);
-	$db->insert_query("settings", $threadlimiter_2);
+		);
+		$db->insert_query("settings", $threadlimiter_2);
 	
-	$threadlimiter_3 = array(
+		$threadlimiter_3 = array(
 		"name"			=> "threadlimiter_limit",
 		"title"			=> $db->escape_string($lang->threadlimiter_limit_title),
 		"description" 	=> $db->escape_string($lang->threadlimiter_limit_title_desc),
-        'optionscode'  	=> 'numeric',
-        'value'        	=> '2',
+        	'optionscode'  	=> 'numeric',
+        	'value'        	=> '2',
 		"disporder"		=> "3",
 		"gid" 			=> (int)$gid
-	);
-	$db->insert_query("settings", $threadlimiter_3);
+		);
+		$db->insert_query("settings", $threadlimiter_3);
 	
-	$threadlimiter_4 = array(
+		$threadlimiter_4 = array(
 		"name"			=> "threadlimiter_reset_time",
 		"title"			=> $db->escape_string($lang->threadlimiter_reset_time_title),
 		"description" 	=> $db->escape_string($lang->threadlimiter_reset_time_title_desc),
-        'optionscode'  	=> 'numeric',
-        'value'        	=> '0',
+        	'optionscode'  	=> 'numeric',
+        	'value'        	=> '0',
 		"disporder"		=> "4",
 		"gid" 			=> (int)$gid
-	);
-	$db->insert_query("settings", $threadlimiter_4);
+		);
+		$db->insert_query("settings", $threadlimiter_4);
 	
 	
-    $threadlimiter_5 = array(
+    		$threadlimiter_5 = array(
 		"name"			=> "threadlimiter_fid",
 		"title"			=> $db->escape_string($lang->threadlimiter_fid_title),
 		"description" 	=> $db->escape_string($lang->threadlimiter_fid_title_desc),
-        'optionscode'  	=> 'forumselect',
-        'value'        	=> '-1',
+        	'optionscode'  	=> 'forumselect',
+        	'value'        	=> '-1',
 		"disporder"		=> "5",
 		"gid" 			=> (int)$gid
-	);
-	$db->insert_query("settings", $threadlimiter_5);
-	rebuild_settings();
+		);
+		$db->insert_query("settings", $threadlimiter_5);
+		rebuild_settings();
+	}
 }
 
 function threadlimiter_deactivate()
