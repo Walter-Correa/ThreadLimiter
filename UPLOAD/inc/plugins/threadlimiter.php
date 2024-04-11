@@ -102,7 +102,7 @@ function threadlimiter_activate()
 		"title"			=> $db->escape_string($lang->threadlimiter_gid_title),
 		"description" 	=> $db->escape_string($lang->threadlimiter_gid_title_desc),
         	'optionscode'  	=> 'groupselect',
-        	'value'        	=> '2,5',
+        	'value'        	=> '-1',
 		"disporder"		=> "2",
 		"gid" 			=> (int)$gid
 		);
@@ -113,7 +113,7 @@ function threadlimiter_activate()
 		"title"			=> $db->escape_string($lang->threadlimiter_limit_title),
 		"description" 	=> $db->escape_string($lang->threadlimiter_limit_title_desc),
         	'optionscode'  	=> 'numeric',
-        	'value'        	=> '2',
+        	'value'        	=> '0',
 		"disporder"		=> "3",
 		"gid" 			=> (int)$gid
 		);
@@ -136,7 +136,7 @@ function threadlimiter_activate()
 		"title"			=> $db->escape_string($lang->threadlimiter_fid_title),
 		"description" 	=> $db->escape_string($lang->threadlimiter_fid_title_desc),
         	'optionscode'  	=> 'forumselect',
-        	'value'        	=> '-1',
+        	'value'        	=> '',
 		"disporder"		=> "5",
 		"gid" 			=> (int)$gid
 		);
@@ -178,7 +178,7 @@ function threadlimiter_addnewthread()
 		}
 		$query = $db->simple_select("threads", "*", "uid='{$mybb->user['uid']}' AND fid='{$fid}'{$resettimer}");
 		$numthreads = $db->num_rows($query);    
-		if($numthreads >= $settings['threadlimiter_limit'])
+		if($numthreads >= $settings['threadlimiter_limit'] && $settings['threadlimiter_enable'])
 		{
 			if ($settings['threadlimiter_limit'] == "1")
 			{
@@ -213,7 +213,7 @@ function threadlimiter_newthreadbutton()
 			}
 			$query = $db->simple_select("threads", "*", "uid='{$mybb->user['uid']}' AND fid='{$fid}'{$resettimer}");
 			$numthreads = $db->num_rows($query);    
-			if($numthreads >= $settings['threadlimiter_limit'])
+			if($numthreads >= $settings['threadlimiter_limit'] && $settings['threadlimiter_enable'])
 			{
 				$hide_button = true;
 				$newthread = "";
