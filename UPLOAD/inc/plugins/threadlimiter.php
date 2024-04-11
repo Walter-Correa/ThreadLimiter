@@ -74,8 +74,8 @@ function threadlimiter_activate()
 	if(empty($group['gid']))
 	{
 		$lang->load('config_threadlimiter');
-		$query_add = $db->simple_select("settinggroups", "COUNT(*)");
-		$rows = $db->fetch_field($query_add, "rows");
+		$query_add = $db->simple_select("settinggroups", "COUNT(*) AS set_rows");
+		$rows = $db->fetch_field($query_add, 'set_rows');
 		$threadlimiter_group = array(
 		"name" 			=>	"threadlimiter_settings",
 		"title" 		=>	$db->escape_string($lang->threadlimiter_settings_title),
